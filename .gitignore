@@ -52,3 +52,9 @@ compile_commands.json
 *creator.user*
 
 *_qmlcache.qrc
+
+# Do not include the build directory
+build/
+
+# Do not include personal vscode settings
+.vscode/
