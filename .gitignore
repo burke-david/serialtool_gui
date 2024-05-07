@@ -58,3 +58,6 @@ build/
 
 # Do not include personal vscode settings
 .vscode/
+
+# Do not include the .cache directory
+.cache/
