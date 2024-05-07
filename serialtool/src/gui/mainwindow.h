@@ -17,6 +17,13 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_pushButton_find_serialports_clicked();
+
+    void on_pushButton_connect_port_clicked();
+
+    void on_pushButton_dump_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

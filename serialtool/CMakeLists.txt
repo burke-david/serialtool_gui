@@ -12,17 +12,26 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
+# Add the following line to your CMakeLists.txt file to include the SerialPort module:
+find_package(Qt6 REQUIRED COMPONENTS SerialPort)
+
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
+        src/main.cpp
+        src/gui/mainwindow.cpp
+        src/gui/mainwindow.h
+        src/gui/mainwindow.ui
 )
+
+include_directories(src)
+include_directories(src/gui)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(serialtool
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        src/serial/serial.h src/serial/serial.cpp
+
+
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET serialtool APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -43,6 +52,8 @@ else()
 endif()
 
 target_link_libraries(serialtool PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+
+target_link_libraries(serialtool PRIVATE Qt6::SerialPort)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
