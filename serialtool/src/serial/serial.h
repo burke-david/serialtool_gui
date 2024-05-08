@@ -1,11 +1,11 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
+#include "../buffer/ringbuffer.h"
 #include <QStringList>
-#include <QMutex>
-#include <QThread>
 #include <QByteArray>
 #include <QObject>
+#include <QTimer>
 #include <QtSerialPort/QSerialPort>
 
 class Serial : public QObject
@@ -16,6 +16,8 @@ public:
     // Delete the copy constructor and assignment operator
     Serial(const Serial&) = delete;
     Serial& operator=(const Serial&) = delete;
+
+
 
     /**
      * Returns the singleton instance of the Serial class.
@@ -44,6 +46,14 @@ public:
      */
     void disconnectSerialPort();
 
+    /**
+     * Returns the data in the buffer.
+     *
+     * @param data A pointer to a char array where the data will be stored.
+     * @return true if the data was successfully retrieved, false otherwise.
+     */
+    bool get_data(char *data);
+
     void dump();
 
 private:
@@ -53,24 +63,18 @@ private:
 
     void read_data();
 
+
     // Static member variable to hold the singleton instance
     static Serial* instance;
 
     QSerialPort *serialPort;
 
-    // Buffer for incoming data
-    QByteArray *buffer;
+    // // Buffer for incoming data
+    // QByteArray *buffer;
 
-    // Mutex for thread safety
-    QMutex *mutex;
+    QTimer *read_timer;
 
-    QThread readerThread;
-
-
-
-signals:
-
-    void start_reading();
+    RingBuffer<char> *rxBuffer;
 };
 
 #endif // SERIAL_H

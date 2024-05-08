@@ -15,6 +15,8 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 # Add the following line to your CMakeLists.txt file to include the SerialPort module:
 find_package(Qt6 REQUIRED COMPONENTS SerialPort)
 
+find_package(Qt6 COMPONENTS PrintSupport REQUIRED)
+
 set(PROJECT_SOURCES
         src/main.cpp
         src/gui/mainwindow.cpp
@@ -30,6 +32,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         src/serial/serial.h src/serial/serial.cpp
+        src/my_data/mydata.h src/my_data/mydata.cpp
+        src/buffer/ringbuffer.h
+        src/plot/qcustomplot.cpp src/plot/qcustomplot.h
 
 
     )
@@ -54,6 +59,8 @@ endif()
 target_link_libraries(serialtool PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
 target_link_libraries(serialtool PRIVATE Qt6::SerialPort)
+
+target_link_libraries(serialtool PRIVATE Qt6::PrintSupport)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
