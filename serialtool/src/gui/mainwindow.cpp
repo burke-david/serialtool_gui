@@ -3,6 +3,8 @@
 #include "../serial/serial.h"
 #include <QTimer>
 
+#define PLOT1_DISPLAY_DATASET_SIZE 1000
+#define PLOT2_DISPLAY_DATASET_SIZE 100
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -114,13 +116,13 @@ void MainWindow::init_plots()
     plot1->addGraph();
     plot1->xAxis->setLabel("Samples");
     plot1->yAxis->setLabel("Value");
-    plot1->xAxis->setRange(0, 100);
+    plot1->xAxis->setRange(0, PLOT1_DISPLAY_DATASET_SIZE);
     plot1->yAxis->setRange(0, 100);
 
     plot2->addGraph();
     plot2->xAxis->setLabel("Samples");
     plot2->yAxis->setLabel("Value");
-    plot2->xAxis->setRange(0, 100);
+    plot2->xAxis->setRange(0, PLOT2_DISPLAY_DATASET_SIZE);
     plot2->yAxis->setRange(0, 100);
 
 
@@ -134,67 +136,58 @@ void MainWindow::update_plots(my_data_point_t *data_point)
     // Update the plots with the new data point
     if (data_point->data_type == DATA_TYPE_1)
     {
-        plot1->graph(0)->addData(data_point->sample_count, data_point->data);
+        plot1_xdata.append((double)data_point->sample_count);
+        plot1_ydata.append((double)data_point->data);
 
-        // // Remove data of lines that's outside visible range:
-        // plot1->graph(0)->removeDataBefore(data_point->sample_count - 100);
-
-        // Get the data container
-        QSharedPointer<QCPDataContainer<QCPGraphData>> dataContainer = plot1->graph(0)->data();
-
-        // Create a new data container
-        QSharedPointer<QCPDataContainer<QCPGraphData>> newDataContainer(new QCPDataContainer<QCPGraphData>);
-
-        // Iterate over the data points
-        for (auto it = dataContainer->begin(); it != dataContainer->end(); ++it)
+        /* Keep the total dataset size limited to a fixed number of your choosing */
+        if (plot1_xdata.size() > PLOT1_DISPLAY_DATASET_SIZE)
         {
-            // If the data point is within the desired range, add it to the new data container
-            if (it->key >= data_point->sample_count - 100)
-                newDataContainer->add(*it);
+            plot1_xdata.removeFirst();
+            plot1_ydata.removeFirst();
         }
 
-        // Set the new data container as the data of the graph
-        plot1->graph(0)->setData(newDataContainer);
+        plot1->graph(0)->setData(plot1_xdata, plot1_ydata, true);
 
         // Autoscale the vertical axis to fit the data
         plot1->graph(0)->rescaleValueAxis();
         plot1->yAxis->setRangeLower(qMax(50.0, plot1->yAxis->range().lower));
 
-        // Adjust the x-axis range to only show the last 100 samples
-        plot1->xAxis->setRange(data_point->sample_count - 100 + 1, data_point->sample_count);
+        // Adjust the x-axis range to only show the last X samples
+        if (data_point->sample_count > PLOT1_DISPLAY_DATASET_SIZE) {
+            plot1->xAxis->setRange(data_point->sample_count - PLOT1_DISPLAY_DATASET_SIZE + 1, data_point->sample_count);
+        }
+        else {
+            plot1->xAxis->setRange(0, PLOT1_DISPLAY_DATASET_SIZE);
+        }
 
         plot1->replot();
+
     }
     else if (data_point->data_type == DATA_TYPE_2)
     {
-        plot2->graph(0)->addData(data_point->sample_count, data_point->data);
+        plot2_xdata.append((double)data_point->sample_count);
+        plot2_ydata.append((double)data_point->data);
 
-        // // Remove data of lines that's outside visible range:
-        // plot2->graph(0)->removeDataBefore(data_point->sample_count - 100);
-
-        // Get the data container
-        QSharedPointer<QCPDataContainer<QCPGraphData>> dataContainer = plot2->graph(0)->data();
-
-        // Create a new data container
-        QSharedPointer<QCPDataContainer<QCPGraphData>> newDataContainer(new QCPDataContainer<QCPGraphData>);
-
-        // Iterate over the data points
-        for (auto it = dataContainer->begin(); it != dataContainer->end(); ++it)
+        /* Keep the total dataset size limited to a fixed number of your choosing */
+        if (plot2_xdata.size() > PLOT2_DISPLAY_DATASET_SIZE)
         {
-            // If the data point is within the desired range, add it to the new data container
-            if (it->key >= data_point->sample_count - 100)
-                newDataContainer->add(*it);
+            plot2_xdata.removeFirst();
+            plot2_ydata.removeFirst();
         }
 
-        // Set the new data container as the data of the graph
-        plot2->graph(0)->setData(newDataContainer);
+        plot2->graph(0)->setData(plot2_xdata, plot2_ydata, true);
 
         // Autoscale the vertical axis to fit the data
         plot2->graph(0)->rescaleValueAxis();
         plot2->yAxis->setRangeLower(qMax(50.0, plot2->yAxis->range().lower));
 
-        // Adjust the x-axis range to only show the last 100 samples
-        plot2->xAxis->setRange(data_point->sample_count - 100 + 1, data_point->sample_count);
+        // Adjust the x-axis range to only show the last X samples
+        if (data_point->sample_count > PLOT2_DISPLAY_DATASET_SIZE) {
+            plot2->xAxis->setRange(data_point->sample_count - PLOT2_DISPLAY_DATASET_SIZE + 1, data_point->sample_count);
+        }
+        else {
+            plot2->xAxis->setRange(0, PLOT2_DISPLAY_DATASET_SIZE);
+        }
 
         plot2->replot();
     }

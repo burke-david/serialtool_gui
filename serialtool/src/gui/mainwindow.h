@@ -51,9 +51,25 @@ private:
      */
     void update_plots(my_data_point_t *data_point);
 
+
+    /**
+     * @brief The QCustomPlot object used for plotting data.
+     */
     QCustomPlot *plot1;
+
+    /**
+     * @brief The QCustomPlot object used for plotting data.
+     */
     QCustomPlot *plot2;
 
+
+    QVector<double> plot1_xdata;
+    QVector<double> plot1_ydata;
+
+    QVector<double> plot2_xdata;
+    QVector<double> plot2_ydata;
+
+    /* An object that handles parsing incoming data from a serial port and storing it in the format I want */
     MyData *my_data;
 };
 #endif // MAINWINDOW_H
