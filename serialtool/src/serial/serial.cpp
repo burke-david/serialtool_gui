@@ -1,72 +1,31 @@
 #include "serial.h"
 #include <QDebug>
-#include <QTimer>
+
 #include <QtSerialPort/QSerialPortInfo>
 
+// #include "serial.moc"
 
-
-class SerialReader : public QObject
-{
-    Q_OBJECT
-
-public slots:
-    void read_data()
-    {
-        while(serialPort->isOpen())
-        {
-            if(serialPort->bytesAvailable())
-            {
-                if(mutex->tryLock())
-                {
-                    buffer->append(serialPort->readAll());
-                    mutex->unlock();
-                }
-            }
-
-            // if (serialPort->waitForReadyRead(1000))
-            // {
-            //     if(mutex->tryLock())
-            //     {
-            //         buffer->append(serialPort->readAll());
-            //         mutex->unlock();
-            //     }
-            // }
-        }
-    }
-public:
-    SerialReader(QSerialPort* serialPort, QByteArray* buffer, QMutex* mutex)
-        : serialPort(serialPort), buffer(buffer), mutex(mutex) {}
-
-private:
-    QSerialPort* serialPort;
-    QByteArray* buffer;
-    QMutex* mutex;
-};
-
-#include "serial.moc"
+// The size of the receive buffer. This is the maximum number of bytes that can be stored in the buffer.
+#define RX_BUFFER_SIZE 1024U
 
 // Initialize the static member variable
 Serial* Serial::instance = nullptr;
 
-SerialReader *reader = nullptr;
-
-
 Serial::Serial()
 {
     // Initialize your Serial object here
-    mutex = new QMutex();
-    buffer = new QByteArray();
+    // buffer = new QByteArray();
     serialPort = new QSerialPort();
+    rxBuffer = new RingBuffer<char>(RX_BUFFER_SIZE);
 }
 
 Serial::~Serial()
 {
     // Clean up your Serial object here
-    readerThread.quit();
-    readerThread.wait();
-    delete mutex;
-    delete buffer;
+    // delete buffer;
     delete serialPort;
+    delete read_timer;
+    delete rxBuffer;
 }
 
 Serial& Serial::getInstance()
@@ -104,19 +63,9 @@ bool Serial::connectSerialPort(const QString& portName)
         return false; // Failed to open the port
     }
 
-
-    // reader = new SerialReader(serialPort, buffer, mutex);
-    // reader->moveToThread(&readerThread);
-    // connect(&readerThread, &QThread::finished, reader, &QObject::deleteLater);
-    // connect(this, &Serial::start_reading, reader, &SerialReader::read_data);
-    // readerThread.start();
-
-    // emit start_reading();
-
-
-    QTimer* timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &Serial::read_data);
-    timer->start(10);
+    read_timer = new QTimer(this);
+    connect(read_timer, &QTimer::timeout, this, &Serial::read_data);
+    read_timer->start(10);
 
     return true; // Successfully opened the port
 }
@@ -125,18 +74,38 @@ void Serial::read_data()
 {
     if(serialPort->bytesAvailable())
     {
-        buffer->append(serialPort->readAll());
+        QByteArray data = serialPort->readAll();
+        for (int i = 0; i < data.size(); i++) {
+            rxBuffer->append(data.at(i));
+        }
 
-        qDebug() << *buffer;
-        buffer->clear();
+        // buffer->append(serialPort->readAll());
+        // qDebug() << *buffer;
+        // buffer->clear();
     }
 
+}
+
+bool Serial::get_data(char *data)
+{
+    if (rxBuffer->size() > 0)
+    {
+        *data = rxBuffer->dequeue();
+        return true;
+    }
+    return false;
 }
 
 void Serial::disconnectSerialPort()
 {
     // Close the serial port
     serialPort->close();
+    /* Cleanup the read_timer */
+    if (read_timer != nullptr)
+    {
+        read_timer->stop();
+        delete read_timer;
+    }
 }
 
 /**
@@ -144,27 +113,5 @@ void Serial::disconnectSerialPort()
  */
 void Serial::dump()
 {
-
-    // if(buffer->isNull())
-    // {
-    //     qDebug() << "Buffer is null";
-    //     return;
-    // }
-
-    // if (mutex->tryLock()) {
-    //     /* read data out of the buffer, copy it to another buffer, then dump that to the terminal */
-    //     if (buffer->size() > 0){
-            
-    //         QByteArray copyBuffer = *buffer;
-    //         buffer->clear();
-    //         qDebug() << copyBuffer;
-    //     }
-    //     mutex->unlock();
-    // }
-
-    if (buffer->size() > 0){
-        qDebug() << *buffer;
-        buffer->clear();
-    }
 
 }
