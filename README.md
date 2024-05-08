@@ -14,7 +14,8 @@ git clone git@github.com:burke-david/serialtool_gui.git
 ```
 
 * Open Qt Creator and open the project by selecting the CMakeLists.txt file in the project directory.
-* Configure the project by selecting a "kit" to use for building the project.
+
+* Configure the project by selecting a "kit" to use for building the project. For Windows machines, select the MSVC kit rather than the MinGW. MinGW seems to cause problems.
 ![configure kits](/doc/img/configure_kits.png)
 * In the Edit -> Projects view, right-click on the serialtool folder and "Run CMake"
 * Right-click again and select "Build"
@@ -22,6 +23,11 @@ git clone git@github.com:burke-david/serialtool_gui.git
 
 
 
+
+## Troubleshooting
+
+* If running on Windows and you have problems with the build using the default MinGW Kit, I recommend running the Qt Maintenance Tool once more and in the Qt -> Qt 6.7.0 menu, select the `MSVC 2019 64-bit` option and use the MSVC kit to build the project instead of MinGW.
+* If you cannot find your COM port on Windows, for instance for an FTDI TTL232R-3v3 cable, make sure to install the appropriate drivers. In the case of the FTDI cable, install the [VCP Driver](http://www.ftdichip.com/drivers/vcp-drivers)
 
 
 
@@ -33,6 +39,8 @@ git clone git@github.com:burke-david/serialtool_gui.git
     <u>**Windows:**</u>
 
     **Compiler:** MSVC (Microsoft Visual C++) or MinGW. MSVC is recommended for better compatibility with Windows libraries. You can install MSVC by installing Visual Studio.
+
+    NOTE: For this project, you may have problems if you try to use MinGW. Highly recommend MSVC. See Troubleshooting section regarding installing the `MSVC 2019 64-bit` kit.
     
     **Build System:** qmake (included with Qt) or CMake.
 
