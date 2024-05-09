@@ -35,6 +35,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/my_data/mydata.h src/my_data/mydata.cpp
         src/buffer/ringbuffer.h
         src/plot/qcustomplot.cpp src/plot/qcustomplot.h
+        src/crc/crc.h src/crc/crc.cpp
 
 
     )

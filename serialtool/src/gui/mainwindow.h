@@ -51,6 +51,8 @@ private:
      */
     void update_plots(my_data_point_t *data_point);
 
+    void displayDataPoint(const my_data_point_t& dataPoint);
+
 
     /**
      * @brief The QCustomPlot object used for plotting data.
