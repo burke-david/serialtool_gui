@@ -94,7 +94,8 @@ void MainWindow::periodic_processing()
     {
         // Update the plots with the new data point
         update_plots(&data_point);
-        qDebug() << "Data point: " << data_point.data_type << " " << data_point.data;
+        displayDataPoint(data_point);
+        // qDebug() << "Data point: " << data_point.data_type << " " << data_point.data;
     }
 }
 
@@ -193,5 +194,13 @@ void MainWindow::update_plots(my_data_point_t *data_point)
     }
 }
 
+void MainWindow::displayDataPoint(const my_data_point_t &dataPoint)
+{
+    QString message = QString("TYPE<%1> Data<%2> Sample<%3>")
+                      .arg(dataPoint.data_type)
+                      .arg(dataPoint.data)
+                      .arg(dataPoint.sample_count);
 
-
+    ui->textEdit->appendPlainText(message);
+    
+}
