@@ -2,8 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QChartView>
 #include "../my_data/mydata.h"
-#include "../plot/qcustomplot.h"
+// #include "../plot/qcustomplot.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -28,8 +30,19 @@ private slots:
 
     void periodic_processing();
 
+
 private:
+
+    struct Extents {
+        double minX;
+        double maxX;
+        double minY;
+        double maxY;
+    };
+    
     Ui::MainWindow *ui;
+
+    void init_test_frame();
 
     /**
      * @brief Initializes the plots in the main window.
@@ -53,17 +66,26 @@ private:
 
     void displayDataPoint(const my_data_point_t& dataPoint);
 
+    bool calculateExtents(const QList<QPointF>& points, Extents& extents);
 
     /**
      * @brief The QCustomPlot object used for plotting data.
      */
-    QCustomPlot *plot1;
+    // QCustomPlot *plot1;
 
     /**
      * @brief The QCustomPlot object used for plotting data.
      */
-    QCustomPlot *plot2;
+    // QCustomPlot *plot2;
 
+    QLineSeries *series1;
+    QLineSeries *series2;
+
+    QChart *chart1;
+    QChart *chart2;
+
+    QChartView *chartView1;
+    QChartView *chartView2;
 
     QVector<double> plot1_xdata;
     QVector<double> plot1_ydata;

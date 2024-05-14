@@ -54,6 +54,16 @@ public:
      */
     bool get_data(char *data);
 
+
+    /**
+     * Sends data over the serial connection.
+     *
+     * @param data The data to be sent.
+     * @param len The length of the data.
+     * @return True if the data was sent successfully, false otherwise.
+     */
+    bool send_data(const char *data, int len);
+
     void dump();
 
 private:

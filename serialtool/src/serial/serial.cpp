@@ -109,8 +109,24 @@ void Serial::disconnectSerialPort()
 }
 
 /**
- * Dumps the contents of the buffer to the console.
+ * Dumps the contents of the buffer to the serial port.
  */
+bool Serial::send_data(const char *data, int len)
+{
+    /* if the serialPort is not open, return false */
+    if (!serialPort->isOpen())
+    {
+        return false;
+    }
+
+    /* Write the data to the serial port */
+    qint64 result = serialPort->write(data, len);
+    /* If the result was successful, return true, else return false */
+    return result == len;
+
+}
+
+
 void Serial::dump()
 {
 
